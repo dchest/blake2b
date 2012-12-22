@@ -30,8 +30,8 @@ type digest struct {
 	nx int             // number of bytes in buffer
 
 	ih         [8]uint64       // initial chain value (after config)
-	paddedKey  [BlockSize]byte // copy of key, padded with zeros (nil if unkeyed)
-	isKeyed    bool            // indicates whether hash should be keyed
+	paddedKey  [BlockSize]byte // copy of key, padded with zeros
+	isKeyed    bool            // indicates whether hash was keyed
 	size       uint8           // digest size in bytes
 	isLastNode bool            // indicates processing of the last node in tree hashing
 }
@@ -71,7 +71,7 @@ func verifyConfig(c *Config) error {
 	if c.Size > Size {
 		return errors.New("digest size is too large")
 	}
-	if len(c.Key) > Size {
+	if len(c.Key) > KeySize {
 		return errors.New("key is too large")
 	}
 	if len(c.Salt) > SaltSize {
