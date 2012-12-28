@@ -89,7 +89,7 @@ func verifyConfig(c *Config) error {
 		if c.Tree.MaxDepth < 2 {
 			return errors.New("incorrect tree depth")
 		}
-		if c.Tree.InnerHashSize < 1 || c.Tree.InnerHashSize > 64 {
+		if c.Tree.InnerHashSize < 1 || c.Tree.InnerHashSize > Size {
 			return errors.New("incorrect tree inner hash size")
 		}
 	}
