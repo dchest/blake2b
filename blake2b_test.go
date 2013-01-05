@@ -49,23 +49,23 @@ func TestKeyedSum(t *testing.T) {
 var bench = New512()
 var buf = make([]byte, 8<<10)
 
-func BenchmarkHash1K(b *testing.B) {
+func BenchmarkWrite1K(b *testing.B) {
 	b.SetBytes(1024)
 	for i := 0; i < b.N; i++ {
 		bench.Write(buf[:1024])
 	}
 }
 
-func BenchmarkHash8K(b *testing.B) {
+func BenchmarkWrite8K(b *testing.B) {
 	b.SetBytes(int64(len(buf)))
 	for i := 0; i < b.N; i++ {
 		bench.Write(buf)
 	}
 }
 
-func BenchmarkFull64(b *testing.B) {
+func BenchmarkHash64(b *testing.B) {
 	b.SetBytes(64)
-	tmp := make([]byte, 32)
+	tmp := make([]byte, 64)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		bench = New512()
@@ -74,7 +74,18 @@ func BenchmarkFull64(b *testing.B) {
 	}
 }
 
-func BenchmarkFull1K(b *testing.B) {
+func BenchmarkHash128(b *testing.B) {
+	b.SetBytes(128)
+	tmp := make([]byte, 64)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		bench = New512()
+		bench.Write(buf[:128])
+		bench.Sum(tmp[0:0])
+	}
+}
+
+func BenchmarkHash1K(b *testing.B) {
 	b.SetBytes(1024)
 	tmp := make([]byte, 32)
 	b.ResetTimer()
