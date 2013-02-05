@@ -15,7 +15,7 @@ func blocks(d *digest, p []uint8) {
 	for len(p) >= BlockSize {
 		// Increment counter.
 		d.t[0] += BlockSize
-		if d.t[0] == 0 {
+		if d.t[0] < BlockSize {
 			d.t[1]++
 		}
 		// Initialize compression function.

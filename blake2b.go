@@ -237,10 +237,11 @@ func (d0 *digest) Sum(in []byte) []byte {
 		}
 	}
 
-	d.t[0] -= BlockSize - uint64(d.nx)
-	if d.t[0]+BlockSize == 0 {
+	dec := BlockSize - uint64(d.nx)
+	if d.t[0] < dec {
 		d.t[1]--
 	}
+	d.t[0] -= dec
 
 	// Pad buffer with zeros.
 	for i := d.nx; i < len(d.x); i++ {
