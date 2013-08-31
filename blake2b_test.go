@@ -19,6 +19,9 @@ func TestSum(t *testing.T) {
 	}
 	h := New512()
 	for i, v := range golden {
+		if v != fmt.Sprintf("%x", Sum512(buf[:i])) {
+			t.Errorf("%d: Sum512(): \nexpected %s\ngot      %x", i, v, Sum512(buf[:i]))
+		}
 		h.Reset()
 		h.Write(buf[:i])
 		sum := h.Sum(nil)
@@ -27,6 +30,16 @@ func TestSum(t *testing.T) {
 		}
 
 	}
+}
+
+func TestSum256(t *testing.T) {
+	// Simple one-hash test.
+	in := "The cryptographic hash function BLAKE2 is an improved version of the SHA-3 finalist BLAKE"
+	good := "e5866d0c42b4e27e89a316fa5c3ba8cacae754e53d8267da37ba1893c2fcd92c"
+	if good != fmt.Sprintf("%x", Sum256([]byte(in))) {
+		t.Errorf("Sum256(): \nexpected %s\ngot      %x", good, Sum256([]byte(in)))
+	}
+
 }
 
 func TestKeyedSum(t *testing.T) {
@@ -65,34 +78,22 @@ func BenchmarkWrite8K(b *testing.B) {
 
 func BenchmarkHash64(b *testing.B) {
 	b.SetBytes(64)
-	tmp := make([]byte, 64)
-	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		bench = New512()
-		bench.Write(buf[:64])
-		bench.Sum(tmp[0:0])
+		Sum512(buf[:64])
 	}
 }
 
 func BenchmarkHash128(b *testing.B) {
 	b.SetBytes(128)
-	tmp := make([]byte, 64)
-	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		bench = New512()
-		bench.Write(buf[:128])
-		bench.Sum(tmp[0:0])
+		Sum512(buf[:128])
 	}
 }
 
 func BenchmarkHash1K(b *testing.B) {
 	b.SetBytes(1024)
-	tmp := make([]byte, 32)
-	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		bench = New512()
-		bench.Write(buf[:1024])
-		bench.Sum(tmp[0:0])
+		Sum512(buf[:1024])
 	}
 }
 

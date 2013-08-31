@@ -65,7 +65,10 @@ type Tree struct {
 	IsLastNode    bool   // indicates processing of the last node of layer
 }
 
-var defaultConfig = &Config{Size: Size}
+var (
+	defaultConfig = &Config{Size: Size}
+	config256     = &Config{Size: 32}
+)
 
 func verifyConfig(c *Config) error {
 	if c.Size > Size {
@@ -111,6 +114,14 @@ func New(c *Config) (hash.Hash, error) {
 			return nil, err
 		}
 	}
+	d := new(digest)
+	d.initialize(c)
+	return d, nil
+}
+
+// initialize initializes digest with the given
+// config, which must be non-nil and verified.
+func (d *digest) initialize(c *Config) {
 	// Create parameter block.
 	var p [BlockSize]byte
 	p[0] = c.Size
@@ -133,7 +144,6 @@ func New(c *Config) (hash.Hash, error) {
 		p[3] = 1
 	}
 	// Initialize.
-	d := new(digest)
 	d.size = c.Size
 	for i := 0; i < 8; i++ {
 		d.h[i] = iv[i] ^ binary.LittleEndian.Uint64(p[i*8:])
@@ -149,24 +159,19 @@ func New(c *Config) (hash.Hash, error) {
 	}
 	// Save a copy of initialized state.
 	copy(d.ih[:], d.h[:])
-	return d, nil
 }
 
 // New512 returns a new hash.Hash computing the BLAKE2b 64-byte checksum.
 func New512() hash.Hash {
-	d, err := New(nil)
-	if err != nil {
-		panic(err.Error())
-	}
+	d := new(digest)
+	d.initialize(defaultConfig)
 	return d
 }
 
 // New256 returns a new hash.Hash computing the BLAKE2b 32-byte checksum.
 func New256() hash.Hash {
-	d, err := New(&Config{Size: 32})
-	if err != nil {
-		panic(err.Error())
-	}
+	d := new(digest)
+	d.initialize(config256)
 	return d
 }
 
@@ -229,7 +234,11 @@ func (d *digest) Write(p []byte) (nn int, err error) {
 func (d0 *digest) Sum(in []byte) []byte {
 	// Make a copy of d0 so that caller can keep writing and summing.
 	d := *d0
+	hash := d.checkSum()
+	return append(in, hash[:]...)
+}
 
+func (d *digest) checkSum() [Size]byte {
 	// Do not create unnecessary copies of the key.
 	if d.isKeyed {
 		for i := 0; i < len(d.paddedKey); i++ {
@@ -253,7 +262,7 @@ func (d0 *digest) Sum(in []byte) []byte {
 		d.f[1] = 0xffffffffffffffff
 	}
 	// Compress last block.
-	blocks(&d, d.x[:])
+	blocks(d, d.x[:])
 
 	var out [Size]byte
 	j := 0
@@ -268,5 +277,23 @@ func (d0 *digest) Sum(in []byte) []byte {
 		out[j+7] = byte(s >> 56)
 		j += 8
 	}
-	return append(in, out[:d.size]...)
+	return out
+}
+
+// Sum512 returns a 64-byte BLAKE2b hash of data.
+func Sum512(data []byte) [64]byte {
+	var d digest
+	d.initialize(defaultConfig)
+	d.Write(data)
+	return d.checkSum()
+}
+
+// Sum256 returns a 32-byte BLAKE2b hash of data.
+func Sum256(data []byte) (out [32]byte) {
+	var d digest
+	d.initialize(config256)
+	d.Write(data)
+	sum := d.checkSum()
+	copy(out[:], sum[:32])
+	return
 }
