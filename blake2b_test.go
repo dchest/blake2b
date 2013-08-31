@@ -42,6 +42,14 @@ func TestSum256(t *testing.T) {
 
 }
 
+func TestSumLength(t *testing.T) {
+	h, _ := New(&Config{Size: 19})
+	sum := h.Sum(nil)
+	if len(sum) != 19 {
+		t.Fatalf("Sum() returned a slice larger than the given hash size")
+	}
+}
+
 func TestKeyedSum(t *testing.T) {
 	buf := make([]byte, len(goldenKeyed))
 	for i := range buf {

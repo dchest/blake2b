@@ -235,7 +235,7 @@ func (d0 *digest) Sum(in []byte) []byte {
 	// Make a copy of d0 so that caller can keep writing and summing.
 	d := *d0
 	hash := d.checkSum()
-	return append(in, hash[:]...)
+	return append(in, hash[:d.size]...)
 }
 
 func (d *digest) checkSum() [Size]byte {
