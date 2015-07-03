@@ -2,6 +2,17 @@ Go implementation of BLAKE2b collision-resistant cryptographic hash function
 created by Jean-Philippe Aumasson, Samuel Neves, Zooko Wilcox-O'Hearn, and
 Christian Winnerlein (https://blake2.net).
 
+Stable version
+--------------
+
+A stable version of this package with commercial support is available
+through StableLib: https://stablelib.com/v1/crypto/blake2b/
+
+
+Development version
+-------------------
+
+
 INSTALLATION
 
     $ go get github.com/dchest/blake2b
@@ -20,4 +31,3 @@ To the extent possible under law, the author have dedicated all copyright
 and related and neighboring rights to this software to the public domain
 worldwide. This software is distributed without any warranty.
 http://creativecommons.org/publicdomain/zero/1.0/
-
