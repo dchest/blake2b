@@ -146,7 +146,7 @@ func (d *digest) initialize(c *Config) {
 		d.isLastNode = true
 	}
 	// Process key.
-	if c.Key != nil {
+	if len(c.Key) > 0 {
 		copy(d.paddedKey[:], c.Key)
 		d.Write(d.paddedKey[:])
 		d.isKeyed = true
